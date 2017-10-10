@@ -1,0 +1,71 @@
+#!/bin/sh
+# Copyright (C) 2017 Yuuki Enomoto All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met: 
+# 
+# 1. Redistributions of source code must retain the above copyright notice, 
+#    this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice, 
+#    this list of conditions and the following disclaimer in the documentation 
+#    and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+# EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+# OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+usage()
+{
+    cat << END
+usage:
+    $0 [--path=<path_to_package>] <filename>
+END
+    exit 2
+}
+
+get_optarg()
+{
+    expr "x$1" : "x[^=]*=\\(.*\\)"
+}
+
+set -u
+
+test $# = 0 && usage 1>&2
+
+pkg_path="${PWD}/packages/$(uname -r)/$(uname -m)"
+
+# parse long-options
+while [ $# -gt 0 ]; do
+    case $1 in
+    -h|--help)
+        usage
+        ;;
+    --path)
+        test -z $2 && (echo "What is $1 parameter?" ; exit 1)
+        pkg_path=$2
+        shift
+        ;;
+    --path=*)
+        pkg_path=$(get_optarg "$1")
+        ;;
+    -|--)
+        break
+        ;;
+    *)
+        break
+        ;;
+    esac
+    shift
+done
+
+for pkg in $(find ${pkg_path} -type f -name '*.tgz'); do
+    line=$(tar zxOf ${pkg} +CONTENTS 2>/dev/null | grep $1)
+    test $? = 0 && printf "\e[1m${pkg}\e[m\n${line}\n"
+done

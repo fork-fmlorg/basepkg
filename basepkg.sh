@@ -928,7 +928,7 @@ moduledir="stand/${machine}/${release}/modules"
 workdir="${PWD}/work/${release}/${machine}"
 kerneldir="${obj}/sys/arch/${machine}/compile"
 
-${TEST} $# -eq 0 && usage
+${TEST} $# -eq 0 && usage 1>&2
 
 # operation
 case $1 in
