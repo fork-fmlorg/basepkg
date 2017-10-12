@@ -2,6 +2,8 @@
 
 test -d /usr/src || exit 1
 
+SRC="/usr/src"
+
 BOOTDISK="wd0"
 IMAGEMB="2048" # 2048MB
 SWAPMB="128" # 128MB
@@ -30,8 +32,8 @@ SWAPOFFSET="$(expr ${LABELSECTORS} + ${FSSECTORS})"
 FSCYLINDERS="$(expr ${FSSECTORS} / \( ${HEADS} \* ${SECTORS} \))"
 SWAPCYLINDERS="$(expr ${SWAPSECTORS} / \( ${HEADS} \* ${SECTORS} \)) || true"
 
-FSTAB_IN="/usr/src/distrib/common/bootimage/fstab.in"
-SPEC_IN="/usr/src/distrib/common/bootimage/spec.in"
+FSTAB_IN="${SRC}/distrib/common/bootimage/fstab.in"
+SPEC_IN="${SRC}/distrib/common/bootimage/spec.in"
 
 IMGMAKEFSOPTIONS="-o bsize=16384,fsize=2048,density=8192"
 
@@ -66,7 +68,7 @@ makefs -M ${FSSIZE} -m ${FSSIZE} \
 
 installboot -v -m amd64 ${WORKFS} ${WORKDIR}/usr/mdec/bootxx_ffsv1
 
-DISKPROTO_IN="/usr/src/distrib/common/bootimage/diskproto.in"
+DISKPROTO_IN="${SRC}/distrib/common/bootimage/diskproto.in"
 
 MBR_DEFAULT_BOOTCODE="mbr"
 OMIT_SWAPIMG="no"
